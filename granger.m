@@ -60,7 +60,11 @@ for i = 1:3
             [A, SIG] = tsdata_to_var(X, moAIC);
             assert(~isbad(A), 'VAR estimation failed');
             [G, info] = var_to_autocov(A, SIG);
-            var_info(info, true);
+            acerr = var_info(info, false);
+
+            if acerr
+                continue
+            end
 
             F = autocov_to_pwcgc(G);
 
