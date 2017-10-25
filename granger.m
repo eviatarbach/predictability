@@ -1,4 +1,5 @@
 nobs = {13870, 2774, 924};
+max_order = {60, 12, 4};
 mhtc = 'FDR';
 
 cd mvgc_v1.0
@@ -54,7 +55,7 @@ for i = 1:3
 
             X = [sst_ts; vort_ts];
 
-            [~, ~, moAIC, ~] = tsdata_to_infocrit(X, 50);
+            [~, ~, moAIC, ~] = tsdata_to_infocrit(X, max_order{i});
             times_i(lon, lat) = moAIC;
 
             [A, SIG] = tsdata_to_var(X, moAIC);
