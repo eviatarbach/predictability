@@ -1,5 +1,6 @@
 import cartopy.crs as ccrs
 import cartopy.feature as cfeature
+from cartopy.util import add_cyclic_point
 import matplotlib.pyplot as plt
 import cmocean
 import scipy.io
@@ -22,10 +23,9 @@ for i in range(3):
     lat = numpy.arange(-90, -90 + 241*0.75, 0.75)
     lon = numpy.arange(0, 480*0.75, 0.75)
 
-    latt, lonn = numpy.meshgrid(lat, lon)
-
-    ratios = F_vort_to_sst[i]/F_sst_to_vort[i]
-    ratios[ratios < 1] = -1/ratios[ratios < 1]
+    ratios = numpy.log(F_vort_to_sst[i]/F_sst_to_vort[i])
+    ratios[ratios > 5] = 5
+    ratios[ratios < -5] = -5
 
     sig_90_vort_to_sst[i][numpy.isnan(sig_90_vort_to_sst[i])] = 0
     sig_90_sst_to_vort[i][numpy.isnan(sig_90_sst_to_vort[i])] = 0
@@ -36,7 +36,11 @@ for i in range(3):
     sig = sig_95_sst_to_vort[i].astype(bool) | sig_95_vort_to_sst[i].astype(bool)
     ratios[~sig] = numpy.nan
 
-    plt.contourf(lonn, latt, ratios, vmin=-15, vmax=15, cmap=cmocean.cm.balance, levels=numpy.hstack([numpy.linspace(-15, -1, 4), numpy.linspace(1, 15, 4)]), transform=ccrs.PlateCarree())
+    ratios_cyc, lon_cyc = add_cyclic_point(ratios.T, coord=lon)
+    
+    latt, lonn = numpy.meshgrid(lat, lon_cyc)
+
+    plt.contourf(lonn, latt, ratios_cyc.T, vmin=-5, vmax=5, cmap=cmocean.cm.balance, levels=numpy.linspace(-5, 5, 40), transform=ccrs.PlateCarree())
     plt.colorbar()
 
     plt.savefig('map_{i}.eps'.format(i=i))

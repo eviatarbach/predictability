@@ -1,5 +1,8 @@
 import cartopy.crs as ccrs
+import cartopy.feature as cfeature
+from cartopy.util import add_cyclic_point
 import matplotlib.pyplot as plt
+import cmocean
 import scipy.io
 import numpy
 
@@ -14,15 +17,17 @@ for i in range(3):
     for j in range(len(F_vort_to_sst[i][0])):
         plt.figure(figsize=(6, 3))
         ax = plt.axes(projection=ccrs.PlateCarree())
-        ax.coastlines()
+        ax.add_feature(cfeature.LAND, color='#D9D9D9')
+        ax.add_feature(cfeature.COASTLINE, linewidth=0.3)
 
         lat = numpy.arange(-90, -90 + 241*0.75, 0.75)
         lon = numpy.arange(0, 480*0.75, 0.75)
 
         latt, lonn = numpy.meshgrid(lat, lon)
 
-        ratios = F_vort_to_sst[i][0][j]/F_sst_to_vort[i][0][j]
-        ratios[ratios < 1] = -1/ratios[ratios < 1]
+        ratios = numpy.log(F_vort_to_sst[i][0][j]/F_sst_to_vort[i][0][j])
+        ratios[ratios > 5] = 5
+        ratios[ratios < -5] = -5
 
         sig_90_vort_to_sst[i][0][j][numpy.isnan(sig_90_vort_to_sst[i][0][j])] = 0
         sig_90_sst_to_vort[i][0][j][numpy.isnan(sig_90_sst_to_vort[i][0][j])] = 0
@@ -33,7 +38,13 @@ for i in range(3):
         sig = sig_95_sst_to_vort[i][0][j].astype(bool) | sig_95_vort_to_sst[i][0][j].astype(bool)
         ratios[~sig] = numpy.nan
 
-        plt.contourf(lonn, latt, ratios, vmin=-15, vmax=15, cmap='seismic', levels=numpy.hstack([numpy.linspace(-15, -1, 4), numpy.linspace(1, 15, 4)]), transform=ccrs.PlateCarree())
+        ratios_cyc, lon_cyc = add_cyclic_point(ratios.T, coord=lon)
+        
+        latt, lonn = numpy.meshgrid(lat, lon_cyc)
+
+        plt.contourf(lonn, latt, ratios_cyc.T, vmin=-5, vmax=5,
+                     cmap=cmocean.cm.balance, levels=numpy.linspace(-5, -5, 40),
+                     transform=ccrs.PlateCarree())
         plt.colorbar()
 
         plt.savefig('map_delay_{i}_{j}.eps'.format(i=i, j=j))
