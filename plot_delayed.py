@@ -39,11 +39,11 @@ for i in range(3):
         ratios[~sig] = numpy.nan
 
         ratios_cyc, lon_cyc = add_cyclic_point(ratios.T, coord=lon)
-        
+
         latt, lonn = numpy.meshgrid(lat, lon_cyc)
 
         plt.contourf(lonn, latt, ratios_cyc.T, vmin=-5, vmax=5,
-                     cmap=cmocean.cm.balance, levels=numpy.linspace(-5, -5, 40),
+                     cmap=cmocean.cm.balance, levels=numpy.linspace(-5, 5, 40),
                      transform=ccrs.PlateCarree())
         plt.colorbar()
 
