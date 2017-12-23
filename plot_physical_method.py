@@ -16,8 +16,10 @@ pentad[pentad == -9999] = numpy.nan
 pentad = pentad.reshape([3, 4, 241, 480])
 
 for i, data in enumerate([daily, pentad]):
-    for j, var in enumerate(['ocean', 'atmos']):
-        anomalies = data[0, 2*j, :, :] + data[0, 2*j + 1, :, :]
+    for j, var in enumerate(['ocean', 'atmos', 'ratio']):
+        ocean = data[0, 0, :, :] + data[0, 1, :, :]
+        atmos = data[0, 2, :, :] + data[0, 3, :, :]
+
         plt.figure()
         ax = plt.axes(projection=ccrs.PlateCarree())
         ax.add_feature(cfeature.LAND, color='#D9D9D9')
@@ -26,23 +28,29 @@ for i, data in enumerate([daily, pentad]):
         lat = numpy.arange(-90, -90 + 241*0.75, 0.75)
         lon = numpy.arange(0, 480*0.75, 0.75)
 
-        anomalies_cyc, lon_cyc = add_cyclic_point(anomalies, coord=lon)
-        
-        latt, lonn = numpy.meshgrid(lat, lon_cyc)
-
         if var == 'atmos':
-            levels = numpy.linspace(numpy.nanmedian(anomalies),
-                                    numpy.nanmax(anomalies), 40)
+            var_to_plot = atmos
+            levels = numpy.linspace(numpy.nanmedian(var_to_plot),
+                                    numpy.nanmax(var_to_plot), 40)
             cmap = cmocean.cm.amp
         elif var == 'ocean':
-            levels = numpy.linspace(numpy.nanmedian(anomalies),
-                                    numpy.nanmax(anomalies), 40)
+            var_to_plot = ocean
+            levels = numpy.linspace(numpy.nanmedian(var_to_plot),
+                                    numpy.nanmax(var_to_plot), 40)
             upper_half = numpy.linspace(0.5, 1, 40)
             cmap = cmocean.cm.balance_r
             colors = cmap(upper_half)
             cmap = LinearSegmentedColormap.from_list('Upper Half', colors)
+        elif var == 'ratio':
+            var_to_plot = numpy.log(atmos/ocean)
+            levels = numpy.linspace(-1, 1, 40)
+            cmap = cmocean.cm.balance
 
-        plt.contourf(lonn, latt, anomalies_cyc.T, vmin=min(levels),
+        var_cyc, lon_cyc = add_cyclic_point(var_to_plot, coord=lon)
+
+        latt, lonn = numpy.meshgrid(lat, lon_cyc)
+
+        plt.contourf(lonn, latt, var_cyc.T, vmin=min(levels),
                      vmax=max(levels), cmap=cmap, levels=levels,
                      transform=ccrs.PlateCarree(), extend='both')
         cb = plt.colorbar(orientation='horizontal', fraction=0.05, pad=0.04)
@@ -51,7 +59,7 @@ for i, data in enumerate([daily, pentad]):
         cb.locator = tick_locator
         cb.update_ticks()
 
-        plt.title('{var} forcing using dynamical rule ({resolution} resolution)'.format(var=['Oceanic', 'Atmospheric'][j], resolution=['daily', 'pentad'][i]))
+        plt.title('{var} forcing using dynamical rule ({resolution} resolution)'.format(var=['Oceanic', 'Atmospheric', 'Ratio'][j], resolution=['daily', 'pentad'][i]))
         plt.savefig('map_physical_{resolution}_{var}.eps'.format(resolution=['daily', 'pentad'][i], var=var))
 
         plt.gcf().clear()

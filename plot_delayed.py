@@ -2,6 +2,7 @@ import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 from cartopy.util import add_cyclic_point
 import matplotlib.pyplot as plt
+from matplotlib import ticker
 import cmocean
 import scipy.io
 import numpy
@@ -45,7 +46,12 @@ for i in range(3):
         plt.contourf(lonn, latt, ratios_cyc.T, vmin=-5, vmax=5,
                      cmap=cmocean.cm.balance, levels=numpy.linspace(-5, 5, 40),
                      transform=ccrs.PlateCarree())
-        plt.colorbar()
+        cb = plt.colorbar(orientation='horizontal', fraction=0.05, pad=0.04)
+        cb.set_label(r'$\alpha$')
+        tick_locator = ticker.MaxNLocator(nbins=9)
+        cb.locator = tick_locator
+        cb.update_ticks()
+
 
         plt.savefig('map_delay_{i}_{j}.eps'.format(i=i, j=j))
 

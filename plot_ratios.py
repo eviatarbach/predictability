@@ -2,6 +2,7 @@ import cartopy.crs as ccrs
 import cartopy.feature as cfeature
 from cartopy.util import add_cyclic_point
 import matplotlib.pyplot as plt
+from matplotlib import ticker
 import cmocean
 import scipy.io
 import numpy
@@ -24,8 +25,6 @@ for i in range(3):
     lon = numpy.arange(0, 480*0.75, 0.75)
 
     ratios = numpy.log(F_vort_to_sst[i]/F_sst_to_vort[i])
-    ratios[ratios > 5] = 5
-    ratios[ratios < -5] = -5
 
     sig_90_vort_to_sst[i][numpy.isnan(sig_90_vort_to_sst[i])] = 0
     sig_90_sst_to_vort[i][numpy.isnan(sig_90_sst_to_vort[i])] = 0
@@ -40,8 +39,14 @@ for i in range(3):
     
     latt, lonn = numpy.meshgrid(lat, lon_cyc)
 
-    plt.contourf(lonn, latt, ratios_cyc.T, vmin=-5, vmax=5, cmap=cmocean.cm.balance, levels=numpy.linspace(-5, 5, 40), transform=ccrs.PlateCarree())
-    plt.colorbar()
+    plt.contourf(lonn, latt, ratios_cyc.T, vmin=-5, vmax=5,
+                 cmap=cmocean.cm.balance, levels=numpy.linspace(-5, 5, 40),
+                 transform=ccrs.PlateCarree(), extend='both')
+    cb = plt.colorbar(orientation='horizontal', fraction=0.05, pad=0.04)
+    cb.set_label(r'$\alpha$')
+    tick_locator = ticker.MaxNLocator(nbins=9)
+    cb.locator = tick_locator
+    cb.update_ticks()
 
     plt.savefig('map_{i}.eps'.format(i=i))
 
