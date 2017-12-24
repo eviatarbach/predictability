@@ -16,7 +16,7 @@ F_vort_to_sst = scipy.io.loadmat('data/F_vort_to_sst.mat')['F_vort_to_sst'][0]
 times = scipy.io.loadmat('data/times.mat')['times'][0]
 
 for i in range(3):
-    plt.figure(figsize=(6, 3))
+    plt.figure()
     ax = plt.axes(projection=ccrs.PlateCarree())
     ax.add_feature(cfeature.LAND, color='#D9D9D9')
     ax.add_feature(cfeature.COASTLINE, linewidth=0.3)

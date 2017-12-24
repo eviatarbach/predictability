@@ -16,7 +16,7 @@ F_vort_to_sst = scipy.io.loadmat('data/F_vort_to_sst_delay.mat')['F_vort_to_sst'
 
 for i in range(3):
     for j in range(len(F_vort_to_sst[i][0])):
-        plt.figure(figsize=(6, 3))
+        plt.figure()
         ax = plt.axes(projection=ccrs.PlateCarree())
         ax.add_feature(cfeature.LAND, color='#D9D9D9')
         ax.add_feature(cfeature.COASTLINE, linewidth=0.3)
@@ -27,8 +27,6 @@ for i in range(3):
         latt, lonn = numpy.meshgrid(lat, lon)
 
         ratios = numpy.log(F_vort_to_sst[i][0][j]/F_sst_to_vort[i][0][j])
-        ratios[ratios > 5] = 5
-        ratios[ratios < -5] = -5
 
         sig_90_vort_to_sst[i][0][j][numpy.isnan(sig_90_vort_to_sst[i][0][j])] = 0
         sig_90_sst_to_vort[i][0][j][numpy.isnan(sig_90_sst_to_vort[i][0][j])] = 0
@@ -45,7 +43,7 @@ for i in range(3):
 
         plt.contourf(lonn, latt, ratios_cyc.T, vmin=-5, vmax=5,
                      cmap=cmocean.cm.balance, levels=numpy.linspace(-5, 5, 40),
-                     transform=ccrs.PlateCarree())
+                     transform=ccrs.PlateCarree(), extend='both')
         cb = plt.colorbar(orientation='horizontal', fraction=0.05, pad=0.04)
         cb.set_label(r'$\alpha$')
         tick_locator = ticker.MaxNLocator(nbins=9)

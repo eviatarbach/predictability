@@ -62,7 +62,6 @@ for j, interval in enumerate(['daily', 'pentad', '15_day']):
         cb.locator = tick_locator
         cb.update_ticks()
 
-
         #plt.title('{var} forcing using Granger causality ({resolution} resolution)'.format(var=['Oceanic', 'Atmospheric'][j], resolution=['daily', 'pentad'][i]))
         plt.savefig('map_comparison_{var}_{interval}.eps'.format(var=var, interval=interval))
 
