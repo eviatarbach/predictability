@@ -33,11 +33,17 @@ for j, interval in enumerate(['daily', 'pentad', '15_day']):
             cmap = cmocean.cm.balance
         elif var == 'atmos':
             var_to_plot = F_vort_to_sst_j
-            levels = numpy.linspace(0, 0.15, 40)
+            if interval == 'pentad':
+                levels = numpy.linspace(0, 0.15, 40)
+            else:
+                levels = numpy.linspace(0, 0.05, 40)
             cmap = cmocean.cm.amp
         elif var == 'ocean':
             var_to_plot = F_sst_to_vort_j
-            levels = numpy.linspace(0, 0.04, 40)
+            if interval == 'pentad':
+                levels = numpy.linspace(0, 0.04, 40)
+            else:
+                levels = numpy.linspace(0, 0.01, 40)
             upper_half = numpy.linspace(0.5, 1, 40)
             cmap = cmocean.cm.balance_r
             colors = cmap(upper_half)
