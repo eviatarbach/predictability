@@ -8,8 +8,9 @@ import cmocean
 import scipy.io
 import numpy
 
-xlabels = [r'$\alpha$', r'$F_{\mathrm{SST}|\mathrm{Vort}}$',
-           r'$F_{\mathrm{Vort}|\mathrm{SST}}$', r'$\operatorname{sgn}(F_{\mathrm{SST}|\mathrm{Vort}}-F_{\mathrm{Vort}|\mathrm{SST}})\,\max(F_{\mathrm{SST}|\mathrm{Vort}}, F_{\mathrm{Vort}|\mathrm{SST}})$']
+xlabels = [r'$\alpha$', r'$\mathrm{GC}_{\mathrm{Vort}\rightarrow\mathrm{SST}}$',
+           r'$\mathrm{GC}_{\mathrm{SST}\rightarrow\mathrm{Vort}}$',
+           r'$\operatorname{sgn}(\mathrm{GC}_{\mathrm{Vort}\rightarrow\mathrm{SST}}-\mathrm{GC}_{\mathrm{SST}\rightarrow\mathrm{Vort}})\,\max(\mathrm{GC}_{\mathrm{SST}\rightarrow\mathrm{Vort}}, \mathrm{GC}_{\mathrm{Vort}\rightarrow\mathrm{SST}})$']
 
 F_sst_to_vort = scipy.io.loadmat('data/F_sst_to_vort.mat')['F_sst_to_vort'][0]
 F_vort_to_sst = scipy.io.loadmat('data/F_vort_to_sst.mat')['F_vort_to_sst'][0]

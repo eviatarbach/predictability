@@ -16,7 +16,7 @@ pentad[pentad == -9999] = numpy.nan
 pentad = pentad.reshape([3, 4, 241, 480])
 
 for i, data in enumerate([daily, pentad]):
-    for j, var in enumerate(['ocean', 'atmos', 'ratio']):
+    for j, var in enumerate(['ocean', 'atmos', 'ratio', 'ratio_sig']):
         ocean = data[0, 0, :, :] + data[0, 1, :, :]
         atmos = data[0, 2, :, :] + data[0, 3, :, :]
 
@@ -45,6 +45,13 @@ for i, data in enumerate([daily, pentad]):
             var_to_plot = numpy.log(atmos/ocean)
             levels = numpy.linspace(-1, 1, 40)
             cmap = cmocean.cm.balance
+        elif var == 'ratio_sig':
+            var_to_plot = numpy.log(atmos/ocean)
+            levels = numpy.linspace(-1, 1, 40)
+            cmap = cmocean.cm.balance
+            med = numpy.nanmedian(numpy.hstack([atmos, ocean]))
+            var_to_plot[(var_to_plot > 0) & (ocean > med)] = numpy.nan
+            var_to_plot[(var_to_plot < 0) & (atmos > med)] = numpy.nan
 
         var_cyc, lon_cyc = add_cyclic_point(var_to_plot, coord=lon)
 
@@ -54,12 +61,15 @@ for i, data in enumerate([daily, pentad]):
                      vmax=max(levels), cmap=cmap, levels=levels,
                      transform=ccrs.PlateCarree(), extend='both')
         cb = plt.colorbar(orientation='horizontal', fraction=0.05, pad=0.04)
-        cb.set_label('Anomaly count')
+        if (var == 'ratio') or (var == 'ratio_sig'):
+            cb.set_label('Log of anomaly count ratio')
+        else:
+            cb.set_label('Anomaly count')
         tick_locator = ticker.MaxNLocator(nbins=9)
         cb.locator = tick_locator
         cb.update_ticks()
 
-        plt.title('{var} forcing using dynamical rule ({resolution} resolution)'.format(var=['Oceanic', 'Atmospheric', 'Ratio'][j], resolution=['daily', 'pentad'][i]))
+        #plt.title('{var} forcing using dynamical rule ({resolution} resolution)'.format(var=['Oceanic', 'Atmospheric', 'Ratio'][j], resolution=['daily', 'pentad'][i]))
         plt.savefig('map_physical_{resolution}_{var}.eps'.format(resolution=['daily', 'pentad'][i], var=var))
 
         plt.gcf().clear()
