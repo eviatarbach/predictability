@@ -1,4 +1,4 @@
-# causality
+# Code for "Causal forcing between sea surface temperature and low-level vorticity in the ocean–atmosphere coupled system"
 
 This repository contains the code for the paper "Causal forcing between sea surface temperature and low-level vorticity in the ocean–atmosphere coupled system" by Eviatar Bach, Safa Motesharrei, Alfredo Ruiz-Barradas, Amir BozorgMagham, and Eugenia Kalnay.
 
