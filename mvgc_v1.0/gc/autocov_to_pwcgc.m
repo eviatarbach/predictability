@@ -55,10 +55,11 @@
 %
 %%
 
-function F = autocov_to_pwcgc(G)
+function [F, mspe] = autocov_to_pwcgc(G)
 
 n = size(G,1);
 F = nan(n);
+mspe = nan(n, n, 2);
 
 % full regression
 
@@ -85,5 +86,7 @@ for j = 1:n
     for ii=1:n-1;
         i = jo(ii);
         F(i,j) = LSIGj(ii)-LSIG(i);
+        mspe(i, j, 1) = exp(LSIGj(ii));
+        mspe(i, j, 2) = exp(LSIG(i));
     end
 end
