@@ -9,14 +9,17 @@ for var in variables:
     for direction in ['sst_to_vort', 'vort_to_sst']:
         all_vars.append('{var}_{dir}'.format(var=var, dir=direction))
 
-data1 = xarray.Dataset(dict(zip(all_vars, [(['lat', 'lon', 'delay'], numpy.full([241, 480, 31], numpy.NaN))]*len(all_vars))),
-        coords={'lat': range(1, 242), 'lon': range(1, 481), 'delay': range(0, 31)})
 
-data5 = xarray.Dataset(dict(zip(all_vars, [(['lat', 'lon', 'delay'], numpy.full([241, 480, 16], numpy.NaN))]*len(all_vars))),
-        coords={'lat': range(1, 242), 'lon': range(1, 481), 'delay': range(0, 16)})
+vars1 = dict(zip(all_vars, [(('lat', 'lon', 'delay'), numpy.full([241, 480, 31], numpy.NaN)) for _ in range(len(all_vars))]))
+data1 = xarray.Dataset(vars1, coords={'lat': range(1, 242),
+                                      'lon': range(1, 481),
+                                      'delay': range(0, 31)})
 
-data15 = xarray.Dataset(dict(zip(all_vars, [(['lat', 'lon', 'delay'], numpy.full([241, 480, 11], numpy.NaN))]*len(all_vars))),
-        coords={'lat': range(1, 242), 'lon': range(1, 481), 'delay': range(0, 11)})
+vars5 = dict(zip(all_vars, [(('lat', 'lon', 'delay'), numpy.full((241, 480, 16), numpy.NaN)) for _ in range(len(all_vars))]))
+data5 = xarray.Dataset(vars5, coords={'lat': range(1, 242), 'lon': range(1, 481), 'delay': range(0, 16)})
+
+vars15 = dict(zip(all_vars, [(('lat', 'lon', 'delay'), numpy.full((241, 480, 11), numpy.NaN)) for _ in range(len(all_vars))]))
+data15 = xarray.Dataset(vars15, coords={'lat': range(1, 242), 'lon': range(1, 481), 'delay': range(0, 11)})
 
 for lon in range(1, 481):
     for var in variables:
