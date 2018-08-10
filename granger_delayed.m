@@ -99,12 +99,12 @@ for i = 1:3
             end
 
             [F_1, mspe_1] = autocov_to_pwcgc(G_vort_cause);  % vort -> sst
-            F_1 = F_1(1, 2)
-            mspe_1 = mspe_1(1, 2)
+            F_1 = F_1(1, 2);
+            mspe_1 = mspe_1(1, 2);
 
             [F_2, mspe_2] = autocov_to_pwcgc(G_sst_cause);  % sst -> vort
-            F_2 = F_2(2, 1)
-            mspe_2 = mspe_2(2, 1)
+            F_2 = F_2(2, 1);
+            mspe_2 = mspe_2(2, 1);
 
             F_vort_to_sst_ij(ilon, lat) = F_1;
             F_sst_to_vort_ij(ilon, lat) = F_2;
