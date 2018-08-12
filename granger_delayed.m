@@ -1,8 +1,9 @@
-function [] = granger_delayed(offset)
+function [] = granger_delayed(offset, length)
 cd /lustre/ebach/causality
 
-nobs = {13870, 2774, 924};
+nobs = {14245, 2849, 949};
 max_delay = {30, 15, 10};
+max_order = {60, 12, 4};
 delays = {0:max_delay{1}, 0:max_delay{2}, 0:max_delay{3}};
 
 cd mvgc_v1.0
@@ -21,18 +22,17 @@ vort_15 = importdata('data/vort_15.mat');
 sst = {sst_01, sst_05, sst_15};
 vort = {vort_01, vort_05, vort_15};
 
-F_vort_to_sst = {NaN(1, 241, max_delay{1} + 1), NaN(1, 241, max_delay{2} + 1), NaN(1, 241, max_delay{3} + 1)};
-F_sst_to_vort = {NaN(1, 241, max_delay{1} + 1), NaN(1, 241, max_delay{2} + 1), NaN(1, 241, max_delay{3} + 1)};
+F_vort_to_sst = {NaN(length, max_delay{1} + 1), NaN(length, max_delay{2} + 1), NaN(length, max_delay{3} + 1)};
+F_sst_to_vort = {NaN(length, max_delay{1} + 1), NaN(length, max_delay{2} + 1), NaN(length, max_delay{3} + 1)};
 
-mspe_vort_to_sst = {NaN(1, 241, max_delay{1} + 1), NaN(1, 241, max_delay{2} + 1), NaN(1, 241, max_delay{3} + 1)};
-mspe_sst_to_vort = {NaN(1, 241, max_delay{1} + 1), NaN(1, 241, max_delay{2} + 1), NaN(1, 241, max_delay{3} + 1)};
+mspe_vort_to_sst = {NaN(length, max_delay{1} + 1), NaN(length, max_delay{2} + 1), NaN(length, max_delay{3} + 1)};
+mspe_sst_to_vort = {NaN(length, max_delay{1} + 1), NaN(length, max_delay{2} + 1), NaN(length, max_delay{3} + 1)};
 
-sig_vort_to_sst = {NaN(1, 241, max_delay{1} + 1), NaN(1, 241, max_delay{2} + 1), NaN(1, 241, max_delay{3} + 1)};
-sig_sst_to_vort = {NaN(1, 241, max_delay{1} + 1), NaN(1, 241, max_delay{2} + 1), NaN(1, 241, max_delay{3} + 1)};
+sig_vort_to_sst = {NaN(length, max_delay{1} + 1), NaN(length, max_delay{2} + 1), NaN(length, max_delay{3} + 1)};
+sig_sst_to_vort = {NaN(length, max_delay{1} + 1), NaN(length, max_delay{2} + 1), NaN(length, max_delay{3} + 1)};
 
-times = importdata('data/times.mat');
-
-%parpool(10)
+times = {NaN(length), NaN(length), NaN(length)};
+%times = importdata('data/times.mat');
 
 'offset', offset
 
@@ -53,27 +53,32 @@ for i = 1:3
     j = 1;
 
     for delay = delays_i
-        F_vort_to_sst_ij = F_vort_to_sst_i(:, :, j);
-        F_sst_to_vort_ij = F_sst_to_vort_i(:, :, j);
-        mspe_vort_to_sst_ij = mspe_vort_to_sst_i(:, :, j);
-        mspe_sst_to_vort_ij = mspe_sst_to_vort_i(:, :, j);
-        sig_vort_to_sst_ij = sig_vort_to_sst_i(:, :, j);
-        sig_sst_to_vort_ij = sig_sst_to_vort_i(:, :, j);
+        F_vort_to_sst_ij = F_vort_to_sst_i(:, j);
+        F_sst_to_vort_ij = F_sst_to_vort_i(:, j);
+        mspe_vort_to_sst_ij = mspe_vort_to_sst_i(:, j);
+        mspe_sst_to_vort_ij = mspe_sst_to_vort_i(:, j);
+        sig_vort_to_sst_ij = sig_vort_to_sst_i(:, j);
+        sig_sst_to_vort_ij = sig_sst_to_vort_i(:, j);
 
-        lon = str2num(offset);
-        ilon = 1;
-        for lat = 1:241
-            lat, lon
-            sst_ts = reshape(sst_i(lon, lat, :), [1, nobs_i]);
-            vort_ts = reshape(vort_i(lon, lat, :), [1, nobs_i]);
+        for cell = 1:length
+            if offset+cell-1 > 88838
+                continue
+            end
+            sst_ts = reshape(sst_i(:, offset+cell-1), [1, nobs_i]);
+            vort_ts = reshape(vort_i(:, offset+cell-1), [1, nobs_i]);
 
-            if (sst_ts(1) == -9999) || (vort_ts(1) == -9999)
+            if (sst_ts(1) == 9999) || (vort_ts(1) == 9999)
                 continue
             end
 
             sst_ts = detrend(sst_ts);  % remove global warming signal
 
-            moAIC = times_i(lon, lat);
+            if delay == 0
+                [~, ~, moAIC, ~] = tsdata_to_infocrit([sst_ts; vort_ts], max_order{i});
+                times_i(cell) = moAIC;
+            else
+                moAIC = times_i(cell);
+            end
 
             sst_ts_effect = sst_ts(1+delay:end);
             sst_ts_cause = sst_ts(1:end-delay);
@@ -106,24 +111,24 @@ for i = 1:3
             F_2 = F_2(2, 1);
             mspe_2 = mspe_2(2, 1);
 
-            F_vort_to_sst_ij(ilon, lat) = F_1;
-            F_sst_to_vort_ij(ilon, lat) = F_2;
+            F_vort_to_sst_ij(cell) = F_1;
+            F_sst_to_vort_ij(cell) = F_2;
 
-            mspe_vort_to_sst_ij(ilon, lat) = mspe_1;
-            mspe_sst_to_vort_ij(ilon, lat) = mspe_2;
+            mspe_vort_to_sst_ij(cell) = mspe_1;
+            mspe_sst_to_vort_ij(cell) = mspe_2;
 
             pval_vort_cause = mvgc_pval(F_1, moAIC, nobs_i - delay, 1, 1, 1, 0);
             pval_sst_cause = mvgc_pval(F_2, moAIC, nobs_i - delay, 1, 1, 1, 0);
 
-            sig_vort_to_sst_ij(ilon, lat) = pval_vort_cause;
-            sig_sst_to_vort_ij(ilon, lat) = pval_sst_cause;
+            sig_vort_to_sst_ij(cell) = pval_vort_cause;
+            sig_sst_to_vort_ij(cell) = pval_sst_cause;
         end
-        F_vort_to_sst_i(:, :, j) = F_vort_to_sst_ij;
-        F_sst_to_vort_i(:, :, j) = F_sst_to_vort_ij;
-        mspe_vort_to_sst_i(:, :, j) = mspe_vort_to_sst_ij;
-        mspe_sst_to_vort_i(:, :, j) = mspe_sst_to_vort_ij;
-        sig_vort_to_sst_i(:, :, j) = sig_vort_to_sst_ij;
-        sig_sst_to_vort_i(:, :, j) = sig_sst_to_vort_ij;
+        F_vort_to_sst_i(:, j) = F_vort_to_sst_ij;
+        F_sst_to_vort_i(:, j) = F_sst_to_vort_ij;
+        mspe_vort_to_sst_i(:, j) = mspe_vort_to_sst_ij;
+        mspe_sst_to_vort_i(:, j) = mspe_sst_to_vort_ij;
+        sig_vort_to_sst_i(:, j) = sig_vort_to_sst_ij;
+        sig_sst_to_vort_i(:, j) = sig_sst_to_vort_ij;
 
         j = j + 1;
     end
@@ -133,11 +138,13 @@ for i = 1:3
     mspe_sst_to_vort{i} = mspe_sst_to_vort_i;
     sig_sst_to_vort{i} = sig_sst_to_vort_i;
     sig_vort_to_sst{i} = sig_vort_to_sst_i;
+    times{i} = times_i;
 end
 
-save(['data/F_vort_to_sst_' offset '.mat'], 'F_vort_to_sst');
-save(['data/F_sst_to_vort_' offset '.mat'], 'F_sst_to_vort');
-save(['data/mspe_vort_to_sst_' offset '.mat'], 'mspe_vort_to_sst');
-save(['data/mspe_sst_to_vort_' offset '.mat'], 'mspe_sst_to_vort');
-save(['data/sig_vort_to_sst_' offset '.mat'], 'sig_vort_to_sst');
-save(['data/sig_sst_to_vort_' offset '.mat'], 'sig_sst_to_vort');
+save(['data/F_vort_to_sst_' num2str(offset) '.mat'], 'F_vort_to_sst');
+save(['data/F_sst_to_vort_' num2str(offset) '.mat'], 'F_sst_to_vort');
+save(['data/mspe_vort_to_sst_' num2str(offset) '.mat'], 'mspe_vort_to_sst');
+save(['data/mspe_sst_to_vort_' num2str(offset) '.mat'], 'mspe_sst_to_vort');
+save(['data/sig_vort_to_sst_' num2str(offset) '.mat'], 'sig_vort_to_sst');
+save(['data/sig_sst_to_vort_' num2str(offset) '.mat'], 'sig_sst_to_vort');
+save(['data/times_' num2str(offset) '.mat'], 'times');
