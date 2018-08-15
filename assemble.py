@@ -3,34 +3,45 @@ import scipy.io
 import xarray
 
 variables = ['F', 'mspe', 'sig']
-all_vars = []
+all_vars = ['times']
 
 for var in variables:
     for direction in ['sst_to_vort', 'vort_to_sst']:
         all_vars.append('{var}_{dir}'.format(var=var, dir=direction))
 
 
-vars1 = dict(zip(all_vars, [(('lat', 'lon', 'delay'), numpy.full([241, 480, 31], numpy.NaN)) for _ in range(len(all_vars))]))
-data1 = xarray.Dataset(vars1, coords={'lat': range(1, 242),
-                                      'lon': range(1, 481),
+vars1 = dict(zip(all_vars, [(('cell', 'delay'), numpy.full((88838, 31), numpy.NaN)) for _ in range(len(all_vars))]))
+data1 = xarray.Dataset(vars1, coords={'cell': range(1, 88839),
                                       'delay': range(0, 31)})
 
-vars5 = dict(zip(all_vars, [(('lat', 'lon', 'delay'), numpy.full((241, 480, 16), numpy.NaN)) for _ in range(len(all_vars))]))
-data5 = xarray.Dataset(vars5, coords={'lat': range(1, 242), 'lon': range(1, 481), 'delay': range(0, 16)})
+vars5 = dict(zip(all_vars, [(('cell', 'delay'), numpy.full((88838, 16), numpy.NaN)) for _ in range(len(all_vars))]))
+data5 = xarray.Dataset(vars5, coords={'cell': range(1, 88839), 'delay': range(0, 16)})
 
-vars15 = dict(zip(all_vars, [(('lat', 'lon', 'delay'), numpy.full((241, 480, 11), numpy.NaN)) for _ in range(len(all_vars))]))
-data15 = xarray.Dataset(vars15, coords={'lat': range(1, 242), 'lon': range(1, 481), 'delay': range(0, 11)})
+vars15 = dict(zip(all_vars, [(('cell', 'delay'), numpy.full((88838, 11), numpy.NaN)) for _ in range(len(all_vars))]))
+data15 = xarray.Dataset(vars15, coords={'cell': range(1, 88839), 'delay': range(0, 11)})
 
-for lon in range(1, 481):
+for offset in range(1, 88838, 185):
+    end = min(88838 - offset + 1, 185)
     for var in variables:
         for direction in ['sst_to_vort', 'vort_to_sst']:
             name = '{var}_{dir}'.format(var=var, dir=direction)
-            mat = scipy.io.loadmat('data/{name}_{lon}.mat'.format(name=name,
-                                                                  lon=lon))[name][0]
-            data1[name][:, lon - 1, :] = mat[0][0]
-            data5[name][:, lon - 1, :] = mat[1][0]
-            data15[name][:, lon - 1, :] = mat[2][0]
+            try:
+                mat = scipy.io.loadmat('data/{name}_{cell}.mat'.format(name=name,
+                                                                       cell=offset))[name][0]
+                data1[name][offset - 1:offset + 185 - 1, :] = mat[0][:end, :]
+                data5[name][offset - 1:offset + 185 - 1, :] = mat[1][:end, :]
+                data15[name][offset - 1:offset + 185 - 1, :] = mat[2][:end, :]
+            except Exception as a:
+                print(offset)
+                print(a)
+    try:
+        mat = scipy.io.loadmat('data/times_{cell}.mat'.format(cell=offset))['times'][0]
+        data1['times'][offset - 1:offset + 185 - 1, 0] = mat[0][:end, 0]
+        data5['times'][offset - 1:offset + 185 - 1, 0] = mat[1][:end, 0]
+        data15['times'][offset - 1:offset + 185 - 1, 0] = mat[2][:end, 0]
+    except Exception as a:
+        print(a)
 
-data1.to_netcdf('data1.nc')
-data5.to_netcdf('data5.nc')
-data15.to_netcdf('data15.nc')
+data1.to_netcdf('data/data01.nc')
+data5.to_netcdf('data/data05.nc')
+data15.to_netcdf('data/data15.nc')
