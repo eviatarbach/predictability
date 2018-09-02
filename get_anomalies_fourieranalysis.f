@@ -13,10 +13,10 @@ C If memory issues arise, compile as follows
 C gfortran -O3 -mcmodel=medium -g -o a.out get_anomalies_fourieranalysis.f
 C where a.out is the executable file
 C     
-      PARAMETER(N3264=4)
-      PARAMETER(UNDEF=-9999.)
-      PARAMETER(NLON=144, NLAT=73, NGP=NLON*NLAT) 
-      PARAMETER(NI=1, NF=11680, NTM=NF-NI+1)  !01/01/1982-12/31/2013 Daily-365
+      PARAMETER(N3264=8)
+      PARAMETER(UNDEF=9999.)
+      PARAMETER(NGP=88838)
+      PARAMETER(NI=1, NF=14235, NTM=NF-NI+1)  !01/01/1979-12/31/2017 Daily-365
 C      PARAMETER(NI=2483, NF=4818, NTM=NF-NI+1)  !01/01/1982-12/27/2013 Pentad
 C      PARAMETER(NI=1, NF=732, NTM=NF-NI+1)    
       PARAMETER(NTSPYR=365) !73 for pentad
@@ -24,26 +24,26 @@ C      PARAMETER(NI=1, NF=732, NTM=NF-NI+1)
       PARAMETER(NHARM=2)!Number of harmonics to be extracted, NHARM has to be <= NTSPYR/2,
 C                       !or (NTSPYR-1)/2 if NTSPYr is odd; if equal then that would be
       DIMENSION Y(NTM)  !equivalent to extract the long-term climatological mean
-      DIMENSION X(NLON,NLAT), XX(NLON,NLAT,NTM)
+      DIMENSION X(NGP), XX(NGP,NTM)
       DIMENSION YY(NGP,NTM)
       DIMENSION HI(NTM,NHARM)
       DIMENSION HIS(NGP,NTM,NHARM), YMS(NGP), TVARS(NGP)
-      DIMENSION H(NLON,NLAT,NTM,NHARM), H2(NLON,NLAT,NHARM,2)
+      DIMENSION H(NGP,NTM,NHARM), H2(NGP,NHARM,2)
       DIMENSION VARIH(NHARM),R2(NHARM), VARIHS(NGP,NHARM),R2S(NGP,NHARM)
 C
-      CHARACTER*31 PATHI
-      CHARACTER*25 PATHO
+      CHARACTER*24 PATHI
+      CHARACTER*24 PATHO
       CHARACTER*60 FILEI, FILEO, FILEOV, FILEOG, FILEOVH, FILEOH
 C     
-      PATHI='/aosc/ganesh/alfredo/ncepdaily/'
-      PATHO='/data/op/alfredo/ekalnay/'
+      PATHI='/lustre/ebach/causality/'
+      PATHO='/lustre/ebach/causality/'
 C     
-      FILEI  ='vort850ocn_ncep_2.5x2.5_daily365_1982-2013.dat'
-      FILEO  ='vortah850ocn_ncep_2.5x2.5_daily365_1982-2013.dat'
-      FILEOV ='vort850ocn_ncep_2.5x2.5_daily365_1982-2013_meanvar.dat'
-      FILEOH ='vort850ocn_ncep_2.5x2.5_daily365_1982-2013_harms.dat'
-      FILEOVH='vort850ocn_ncep_2.5x2.5_daily365_1982-2013_varharms.dat'
-      FILEOG ='grid_vort850ocn_ncep_2.5x2.5_daily365.dat'
+      FILEI  ='vort850_daily365_1979-2017.dat'
+      FILEO  ='vortah850_daily365_1979-2017.dat'
+      FILEOV ='vort850_daily365_1979-2017_meanvar.dat'
+      FILEOH ='vort850_daily365_1979-2017_harms.dat'
+      FILEOVH='vort850_daily365_1979-2017_varharms.dat'
+      FILEOG ='grid_vort850_daily365.dat'
 C      FILEI  ='vort850ocn_ncep_2.5x2.5_pentad_1948-2014.dat'
 C      FILEO  ='vortah850ocn_ncep_2.5x2.5_pen1982-2013.dat'
 C      FILEOV ='vort850ocn_ncep_2.5x2.5_pen1982-2013_meanvar.dat'
@@ -68,24 +68,20 @@ C
       DO I=NI, NF
          J=I-NI+1
          READ(11,REC=I) X
-         DO LO = 1, NLON
-            DO LA = 1, NLAT
-               XX(LO,LA,J)=X(LO,LA)
-            ENDDO
+         DO LO = 1, NGP
+           XX(LO,J)=X(LO)
          ENDDO
       ENDDO
       DO J=1, NTM
          N=0
-         DO LO=1, NLON
-            DO LA =1, NLAT
-               X(LO,LA)=XX(LO,LA,J)
-	       IF(X(LO,LA).NE.UNDEF) THEN 
+         DO LO=1, NGP
+               X(LO)=XX(LO,J)
+	       IF(X(LO).NE.UNDEF) THEN 
 	          N = N + 1
-                  YY(N,J)=X(LO,LA)
+                  YY(N,J)=X(LO)
 		  IF(J.EQ.1)
-     -               WRITE(22,*) J, LO, LA, N
+     -               WRITE(22,*) J, LO, N
 	          ENDIF
-            ENDDO
 	 ENDDO
          WRITE(*,*)N,' DEFINED GRID POINTS'
       ENDDO
@@ -133,53 +129,45 @@ C
 C Saving Anomalies
       WRITE(*,*)'Saving Anomalies'
       DO J=1, NTM
-         DO LO=1, NLON
-            DO LA=1, NLAT
-               H(LO,LA,J,1)=UNDEF
-            ENDDO
+         DO LO=1, NGP
+           H(LO,J,1)=UNDEF
          ENDDO
       ENDDO
       DO J=1, NTM
          OPEN(22,FILE=FILEOG,STATUS='UNKNOWN')
          DO I=1, NUMDEF
-            READ(22,*)MES,LON,LAT,NP
-            H(LON,LAT,J,1)=YY(NP,J)     
+            READ(22,*)MES,LON,NP
+            H(LON,J,1)=YY(NP,J)     
          ENDDO
          CLOSE(22)
       ENDDO
       NRECW=0
       DO J=1, NTM          !NTM time steps
          NRECW=NRECW+1
-         DO LO=1, NLON ! NLON*NLAT grid points
-            DO LA=1, NLAT
-               X(LO,LA)=H(LO,LA,J,1)
-            ENDDO
+         DO LO=1, NGP ! NLON*NLAT grid points
+           X(LO)=H(LO,J,1)
          ENDDO
          WRITE(13,REC=NRECW) X
       ENDDO
 C
 C Saving Mean and Variance of the original Raw Sample Time Series
       WRITE(*,*)'Saving Mean and Variance of the original Raw Maps'
-      DO LO=1, NLON
-         DO LA=1, NLAT
-            H2(LO,LA,1,1)=UNDEF
-            H2(LO,LA,1,2)=UNDEF
-         ENDDO
+      DO LO=1, NGP
+        H2(LO,1,1)=UNDEF
+        H2(LO,1,2)=UNDEF
       ENDDO
       OPEN(22,FILE=FILEOG,STATUS='UNKNOWN')
       DO I=1, NUMDEF
-         READ(22,*)MES,LON,LAT,NP
-         H2(LON,LAT,1,1)=YMS(NP)     
-         H2(LON,LAT,1,2)=TVARS(NP)     
+         READ(22,*)MES,LON,NP
+         H2(LON,1,1)=YMS(NP)     
+         H2(LON,1,2)=TVARS(NP)     
       ENDDO
       CLOSE(22)
       NRECW=0
       DO NR=1, 2
          NRECW=NRECW+1
-         DO LO=1, NLON ! NLON*NLAT grid points
-            DO LA=1, NLAT
-               X(LO,LA)=H2(LO,LA,1,NR)
-            ENDDO
+         DO LO=1, NGP ! NLON*NLAT grid points
+           X(LO)=H2(LO,1,NR)
          ENDDO
          WRITE(14,REC=NRECW) X
       ENDDO
@@ -188,10 +176,8 @@ C Saving Individual Harmonics
       WRITE(*,*)'Saving Individual Harmonics'
       DO J=1, NTM
          DO K=1, NHARM
-            DO LO=1, NLON
-               DO LA=1, NLAT
-                  H(LO,LA,J,K)=UNDEF
-               ENDDO
+            DO LO=1, NGP
+              H(LO,J,K)=UNDEF
             ENDDO
          ENDDO
       ENDDO
@@ -199,8 +185,8 @@ C Saving Individual Harmonics
          DO K=1, NHARM
             OPEN(22,FILE=FILEOG,STATUS='UNKNOWN')
             DO I=1, NUMDEF
-               READ(22,*)MES,LON,LAT,NP
-               H(LON,LAT,J,K)=HIS(NP,J,K)     
+               READ(22,*)MES,LON,NP
+               H(LON,J,K)=HIS(NP,J,K)     
             ENDDO
             CLOSE(22)
         ENDDO
@@ -209,10 +195,8 @@ C Saving Individual Harmonics
       DO J=1, NTM          !NTM time steps
          DO K=1, NHARM  !NHARM levels
             NRECW=NRECW+1
-            DO LO=1, NLON ! NLON*NLAT grid points
-               DO LA=1, NLAT
-                  X(LO,LA)=H(LO,LA,J,K)
-               ENDDO
+            DO LO=1, NGP ! NLON*NLAT grid points
+              X(LO)=H(LO,J,K)
             ENDDO
             WRITE(15,REC=NRECW) X
          ENDDO
@@ -221,19 +205,17 @@ C
 C Saving Variances and Coeff of Determination of the Harmonics
       WRITE(*,*)'Saving Variances and Coeff of Det of the Harmonics'
       DO K=1, NHARM
-         DO LO=1, NLON
-            DO LA=1, NLAT
-               H2(LO,LA,K,1)=UNDEF
-               H2(LO,LA,K,2)=UNDEF
-            ENDDO
+         DO LO=1, NGP
+           H2(LO,K,1)=UNDEF
+           H2(LO,K,2)=UNDEF
          ENDDO
       ENDDO
       DO K=1, NHARM
          OPEN(22,FILE=FILEOG,STATUS='UNKNOWN')
          DO I=1, NUMDEF
-            READ(22,*)MES,LON,LAT,NP
-            H2(LON,LAT,K,1)=VARIHS(NP,K)     
-            H2(LON,LAT,K,2)=R2S(NP,K)     
+            READ(22,*)MES,LON,NP
+            H2(LON,K,1)=VARIHS(NP,K)     
+            H2(LON,K,2)=R2S(NP,K)     
          ENDDO
          CLOSE(22)
       ENDDO
@@ -241,10 +223,8 @@ C Saving Variances and Coeff of Determination of the Harmonics
       DO K=1, NHARM  !NHARM levels
          DO NR=1, 2
             NRECW=NRECW+1
-            DO LO=1, NLON ! NLON*NLAT grid points
-               DO LA=1, NLAT
-                  X(LO,LA)=H2(LO,LA,K,NR)
-               ENDDO
+            DO LO=1, NGP ! NLON*NLAT grid points
+              X(LO)=H2(LO,K,NR)
             ENDDO
             WRITE(16,REC=NRECW) X
          ENDDO

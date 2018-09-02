@@ -21,8 +21,8 @@ for i, data in enumerate([daily, pentad]):
         atmos = data[0, 2, :, :] + data[0, 3, :, :]
 
         plt.figure()
-        ax = plt.axes(projection=ccrs.PlateCarree())
-        ax.add_feature(cfeature.LAND, color='#D9D9D9')
+        ax = plt.axes(projection=ccrs.Robinson())
+        ax.add_feature(cfeature.LAND, color='#D9D9D9', zorder=1)
         ax.add_feature(cfeature.COASTLINE, linewidth=0.3)
 
         lat = numpy.arange(-90, -90 + 241*0.75, 0.75)
@@ -64,12 +64,12 @@ for i, data in enumerate([daily, pentad]):
         if (var == 'ratio') or (var == 'ratio_sig'):
             cb.set_label('Log of anomaly count ratio')
         else:
-            cb.set_label('Anomaly count')
+            cb.set_label('Anomaly count', size=13)
         tick_locator = ticker.MaxNLocator(nbins=9)
         cb.locator = tick_locator
         cb.update_ticks()
 
         #plt.title('{var} forcing using dynamical rule ({resolution} resolution)'.format(var=['Oceanic', 'Atmospheric', 'Ratio'][j], resolution=['daily', 'pentad'][i]))
-        plt.savefig('map_physical_{resolution}_{var}.eps'.format(resolution=['daily', 'pentad'][i], var=var))
+        plt.savefig('map_physical_{resolution}_{var}.pdf'.format(resolution=['daily', 'pentad'][i], var=var))
 
         plt.gcf().clear()

@@ -1,7 +1,7 @@
 function [] = granger_delayed(offset, length)
 cd /lustre/ebach/causality
 
-nobs = {14245, 2849, 949};
+nobs = {14235, 2847, 949};
 max_delay = {30, 15, 10};
 max_order = {60, 12, 4};
 delays = {0:max_delay{1}, 0:max_delay{2}, 0:max_delay{3}};
@@ -12,12 +12,12 @@ startup
 
 cd ..
 
-sst_01 = importdata('data/sst_01.mat');
-vort_01 = importdata('data/vort_01.mat');
-sst_05 = importdata('data/sst_05.mat');
-vort_05 = importdata('data/vort_05.mat');
-sst_15 = importdata('data/sst_15.mat');
-vort_15 = importdata('data/vort_15.mat');
+sst_01 = importdata('data/sst01_365.mat');
+vort_01 = importdata('data/vort01_365.mat');
+sst_05 = importdata('data/sst05_365.mat');
+vort_05 = importdata('data/vort05_365.mat');
+sst_15 = importdata('data/sst15_365.mat');
+vort_15 = importdata('data/vort15_365.mat');
 
 sst = {sst_01, sst_05, sst_15};
 vort = {vort_01, vort_05, vort_15};
