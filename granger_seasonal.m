@@ -31,15 +31,11 @@ times_i = times{1};
 'offset', offset
 
 for i = 1:4
-    nobs_i = nobs{i};
     sst_i = sst{i};
     vort_i = vort{i};
-    delays_i = delays{i};
 
     F_vort_to_sst_i = F_vort_to_sst{i};
     F_sst_to_vort_i = F_sst_to_vort{i};
-    mspe_vort_to_sst_i = mspe_vort_to_sst{i};
-    mspe_sst_to_vort_i = mspe_sst_to_vort{i};
     sig_sst_to_vort_i = sig_sst_to_vort{i};
     sig_vort_to_sst_i = sig_vort_to_sst{i};
 
@@ -54,12 +50,12 @@ for i = 1:4
             continue
         end
 
-        moAIC = times(offset+cell-1);
-
-        nobs, ntrials = size(sst_ts);
+        [nobs, ntrials] = size(sst_ts);
         X = NaN(2, nobs, ntrials);
         X(1, :, :) = sst_ts;
         X(2, :, :) = vort_ts;
+
+        moAIC = times_i(cell);
 
         [A, SIG] = tsdata_to_var(X, moAIC);
         assert(~isbad(A), 'VAR estimation failed');
@@ -78,8 +74,8 @@ for i = 1:4
         F_vort_to_sst_i(cell) = F_1;
         F_sst_to_vort_i(cell) = F_2;
 
-        pval_vort_cause = mvgc_pval(F_1, moAIC, nobs, 1, 1, 1, 0);
-        pval_sst_cause = mvgc_pval(F_2, moAIC, nobs, 1, 1, 1, 0);
+        pval_vort_cause = mvgc_pval(F_1, moAIC, nobs*ntrials, 1, 1, 1, 0);
+        pval_sst_cause = mvgc_pval(F_2, moAIC, nobs*ntrials, 1, 1, 1, 0);
 
         sig_vort_to_sst_i(cell) = pval_vort_cause;
         sig_sst_to_vort_i(cell) = pval_sst_cause;
