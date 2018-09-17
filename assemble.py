@@ -32,15 +32,16 @@ for offset in range(1, 88838, 185):
                 data5[name][offset - 1:offset + 185 - 1, :] = mat[1][:end, :]
                 data15[name][offset - 1:offset + 185 - 1, :] = mat[2][:end, :]
             except Exception as a:
-                print(offset)
-                print(a)
+                pass
+                #print(offset)
+                #print(a)
     try:
         mat = scipy.io.loadmat('data/times_{cell}.mat'.format(cell=offset))['times'][0]
         data1['times'][offset - 1:offset + 185 - 1, 0] = mat[0][:end, 0]
         data5['times'][offset - 1:offset + 185 - 1, 0] = mat[1][:end, 0]
         data15['times'][offset - 1:offset + 185 - 1, 0] = mat[2][:end, 0]
     except Exception as a:
-        print(a)
+        print(offset)
 
 data1.to_netcdf('data/data01.nc')
 data5.to_netcdf('data/data05.nc')

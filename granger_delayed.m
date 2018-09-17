@@ -42,7 +42,7 @@ for i = 1:3
     vort_i = vort{i};
     delays_i = delays{i};
 
-    times_i = times{i}; % Need to do this for parfor to work
+    times_i = times{i};
     F_vort_to_sst_i = F_vort_to_sst{i};
     F_sst_to_vort_i = F_sst_to_vort{i};
     mspe_vort_to_sst_i = mspe_vort_to_sst{i};

@@ -21,6 +21,7 @@ data_summer = xarray.Dataset(vars_summer, coords={'cell': range(1, 88839)})
 vars_fall = dict(zip(all_vars, [(('cell'), numpy.full(88838, numpy.NaN)) for _ in range(len(all_vars))]))
 data_fall = xarray.Dataset(vars_fall, coords={'cell': range(1, 88839)})
 
+missing = []
 for offset in range(1, 88838, 185):
     end = min(88838 - offset + 1, 185)
     for var in variables:
@@ -35,8 +36,9 @@ for offset in range(1, 88838, 185):
                 data_summer[name2][offset - 1:offset + 185 - 1] = mat[2][:, 0][:end]
                 data_fall[name2][offset - 1:offset + 185 - 1] = mat[3][:, 0][:end]
             except Exception as a:
-                print(offset)
-                print(a)
+                if name2 == 'F_sst_to_vort':
+                    missing.append(offset)
+                    print(offset)
 
 data_winter.to_netcdf('data/data_winter.nc')
 data_spring.to_netcdf('data/data_spring.nc')
