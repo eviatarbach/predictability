@@ -141,10 +141,10 @@ for i = 1:3
     times{i} = times_i;
 end
 
-save(['data/F_vort_to_sst_' num2str(offset) '.mat'], 'F_vort_to_sst');
-save(['data/F_sst_to_vort_' num2str(offset) '.mat'], 'F_sst_to_vort');
-save(['data/mspe_vort_to_sst_' num2str(offset) '.mat'], 'mspe_vort_to_sst');
-save(['data/mspe_sst_to_vort_' num2str(offset) '.mat'], 'mspe_sst_to_vort');
-save(['data/sig_vort_to_sst_' num2str(offset) '.mat'], 'sig_vort_to_sst');
-save(['data/sig_sst_to_vort_' num2str(offset) '.mat'], 'sig_sst_to_vort');
-save(['data/times_' num2str(offset) '.mat'], 'times');
+save(['data15/F_vort_to_sst_' num2str(offset) '.mat'], 'F_vort_to_sst');
+save(['data15/F_sst_to_vort_' num2str(offset) '.mat'], 'F_sst_to_vort');
+save(['data15/mspe_vort_to_sst_' num2str(offset) '.mat'], 'mspe_vort_to_sst');
+save(['data15/mspe_sst_to_vort_' num2str(offset) '.mat'], 'mspe_sst_to_vort');
+save(['data15/sig_vort_to_sst_' num2str(offset) '.mat'], 'sig_vort_to_sst');
+save(['data15/sig_sst_to_vort_' num2str(offset) '.mat'], 'sig_sst_to_vort');
+save(['data15/times_' num2str(offset) '.mat'], 'times');

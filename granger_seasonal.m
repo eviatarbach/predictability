@@ -22,6 +22,9 @@ vort = {vort_winter, vort_spring, vort_summer, vort_fall};
 F_vort_to_sst = {NaN(length), NaN(length), NaN(length), NaN(length)};
 F_sst_to_vort = {NaN(length), NaN(length), NaN(length), NaN(length)};
 
+mspe_vort_to_sst = {NaN(length), NaN(length), NaN(length), NaN(length)};
+mspe_sst_to_vort = {NaN(length), NaN(length), NaN(length), NaN(length)};
+
 sig_vort_to_sst = {NaN(length), NaN(length), NaN(length), NaN(length)};
 sig_sst_to_vort = {NaN(length), NaN(length), NaN(length), NaN(length)};
 
@@ -36,6 +39,8 @@ for i = 1:4
 
     F_vort_to_sst_i = F_vort_to_sst{i};
     F_sst_to_vort_i = F_sst_to_vort{i};
+    mspe_vort_to_sst_i = mspe_vort_to_sst{i};
+    mspe_sst_to_vort_i = mspe_sst_to_vort{i};
     sig_sst_to_vort_i = sig_sst_to_vort{i};
     sig_vort_to_sst_i = sig_vort_to_sst{i};
 
@@ -66,13 +71,19 @@ for i = 1:4
             continue
         end
 
-        F = autocov_to_pwcgc(G);
+        [F, mspe] = autocov_to_pwcgc(G);
 
         F_1 = F(1, 2);  % vort -> sst
         F_2 = F(2, 1);  % sst -> vort
 
         F_vort_to_sst_i(cell) = F_1;
         F_sst_to_vort_i(cell) = F_2;
+
+        mspe_1 = mspe(1, 2);
+        mspe_2 = mspe(2, 1);
+
+        mspe_vort_to_sst_i(cell) = mspe_1;
+        mspe_sst_to_vort_i(cell) = mspe_2;
 
         pval_vort_cause = mvgc_pval(F_1, moAIC, nobs*ntrials, 1, 1, 1, 0);
         pval_sst_cause = mvgc_pval(F_2, moAIC, nobs*ntrials, 1, 1, 1, 0);
@@ -82,11 +93,15 @@ for i = 1:4
     end
     F_vort_to_sst{i} = F_vort_to_sst_i;
     F_sst_to_vort{i} = F_sst_to_vort_i;
+    mspe_vort_to_sst{i} = mspe_vort_to_sst_i;
+    mspe_sst_to_vort{i} = mspe_sst_to_vort_i;
     sig_sst_to_vort{i} = sig_sst_to_vort_i;
     sig_vort_to_sst{i} = sig_vort_to_sst_i;
 end
 
 save(['data/F_seasonal_vort_to_sst_' num2str(offset) '.mat'], 'F_vort_to_sst');
 save(['data/F_seasonal_sst_to_vort_' num2str(offset) '.mat'], 'F_sst_to_vort');
+save(['data/mspe_seasonal_vort_to_sst_' num2str(offset) '.mat'], 'mspe_vort_to_sst');
+save(['data/mspe_seasonal_sst_to_vort_' num2str(offset) '.mat'], 'mspe_sst_to_vort');
 save(['data/sig_seasonal_vort_to_sst_' num2str(offset) '.mat'], 'sig_vort_to_sst');
 save(['data/sig_seasonal_sst_to_vort_' num2str(offset) '.mat'], 'sig_sst_to_vort');

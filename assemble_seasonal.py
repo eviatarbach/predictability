@@ -2,7 +2,7 @@ import numpy
 import scipy.io
 import xarray
 
-variables = ['F', 'sig']
+variables = ['F', 'mspe', 'sig']
 all_vars = []
 
 for var in variables:
