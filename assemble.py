@@ -1,6 +1,7 @@
 import numpy
 import scipy.io
 import xarray
+import hdf5storage
 
 variables = ['F', 'mspe', 'sig']
 all_vars = ['times']
@@ -42,6 +43,10 @@ for offset in range(1, 88838, 185):
         data15['times'][offset - 1:offset + 185 - 1, 0] = mat[2][:end, 0]
     except Exception as a:
         print(offset)
+
+matfiledata = {}
+matfiledata['times'] = data1['times'].data 
+hdf5storage.write(matfiledata, '.', 'data/times.mat', matlab_compatible=True)
 
 data1.to_netcdf('data/data01.nc')
 data5.to_netcdf('data/data05.nc')

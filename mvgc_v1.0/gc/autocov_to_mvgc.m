@@ -54,7 +54,7 @@
 %
 %%
 
-function F = autocov_to_mvgc(G,x,y)
+function [F, mspe_full, mspe_reduced] = autocov_to_mvgc(G,x,y)
 
 n = size(G,1);
 
@@ -86,4 +86,6 @@ warn_test(owstate,     'in reduced regression - bad autocovariance matrix? Check
 if warn_if(isbad(SIGR),'in reduced regression - regression failed'), return; end % show-stopper!
 
 x = 1:length(x);
-F = log(det(SIGR(x,x)))-log(det(SIG(x,x)));
+mspe_full = det(SIG(x,x));
+mspe_reduced = det(SIGR(x,x));
+F = log(mspe_reduced)-log(mspe_full);

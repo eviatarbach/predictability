@@ -21,7 +21,7 @@ for i, data in enumerate([daily, pentad]):
         atmos = data[0, 2, :, :] + data[0, 3, :, :]
 
         plt.figure()
-        ax = plt.axes(projection=ccrs.Robinson())
+        ax = plt.axes(projection=ccrs.EqualEarth())
         ax.add_feature(cfeature.LAND, color='#D9D9D9', zorder=1)
         ax.add_feature(cfeature.COASTLINE, linewidth=0.3)
 
