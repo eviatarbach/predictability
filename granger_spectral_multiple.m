@@ -1,8 +1,6 @@
 function [] = granger_spectral_multiple(offset, length)
-cd /lustre/ebach/causality
 
 nobs = 14235;
-%max_order = 45;
 fres = 300;
 
 cd mvgc_v1.0

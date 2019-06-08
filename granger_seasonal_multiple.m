@@ -1,5 +1,4 @@
 function [] = granger_seasonal_multiple(offset, length)
-cd /lustre/ebach/causality
 
 cd mvgc_v1.0
 
@@ -54,9 +53,7 @@ mspe_reduced_sst_to_atmos = {NaN(length), NaN(length), NaN(length), NaN(length)}
 sig_atmos_to_sst = {NaN(length), NaN(length), NaN(length), NaN(length)};
 sig_sst_to_atmos = {NaN(length), NaN(length), NaN(length), NaN(length)};
 
-%times = importdata(['data/times_' num2str(offset) '.mat']);
 times = importdata('data/times.mat');
-%times_i = times{1};
 
 'offset', offset
 
