@@ -5,7 +5,7 @@ import pandas
 def leap_day(s):
     return (s.year % 4 == 0) & ((s.year % 100 != 0) | (s.year % 400 == 0)) & (s.month == 2) & (s.day == 29)
 
-for var in ['div', 'pressure', 'q', 'sst', 'temp', 'vort']:
+for var in ['div', 'sp', 'q', 'sst', 'temp', 'vort']:
     dat = pygrib.open('{var}.grib'.format(var=var)).select()
 
     rng = pandas.date_range(start='1/1/1979', end='12/31/2017', freq='D')

@@ -29,7 +29,7 @@ matfiledata['sst'] = all_dat5
 hdf5storage.write(matfiledata, '.', 'data/sst05_365.mat',
                   matlab_compatible=True)
 
-for var in ['temp', 'q', 'pressure', 'div']:
+for var in ['temp', 'q', 'sp', 'div']:
     all_dat = numpy.fromfile('{var}ah_daily365_1979-2017.dat'.format(var=var),
                              dtype='f8').reshape([14235, 88838])
 

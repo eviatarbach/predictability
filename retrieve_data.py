@@ -31,7 +31,7 @@ server.retrieve({
     "stream": "oper",
     "time": "00:00:00/06:00:00/12:00:00/18:00:00",
     "type": "an",
-    "target": "pressure.grib",
+    "target": "sp.grib",
 })
 
 server.retrieve({
