@@ -35,5 +35,12 @@ The files are listed in the order that they should be run:
 
 - **daily_data.py**: Takes daily means of the reanalysis data and removes leap days.
 - **retrieve_data.py**: Retrieves the reanalysis data (ERA-Interim) from ECMWF.
+- **convert_anomalies.py**: Convert the anomalies to HDF5 for Matlab.
+- **granger.m**: Performs the main Granger causality analysis, as well as that for lead time (generates output used in Figs. 2–5 and 8a).
+- **granger_seasonal.m**: Performs the Granger causality analysis by season (generates output used in Fig. 7).
+- **granger_spectral.m**: Performs the spectral Granger causality analysis (generates output used in Figs. 6, 8b, and S3 in the Supplementary Information)
+- **assemble.py**: Assembles the pieces after ``granger.m`` into a NetCDF file.
+- **assemble_spectral.py**: Assembles the pieces after ``granger_spectral.m`` into a NetCDF file.
+- **assemble_seasonal.py**: Assembles the pieces after ``granger_seasonal.m`` into NetCDF files.
 - **variance.py**: Computes the variance of the SST data as well as the generalized variance of the atmospheric variables.
-- **Plots.ipynb**: Jupyter notebook that generates all the figures in the paper (except the diagram).
+- **Plots.ipynb**: Jupyter notebook that generates all the figures in the paper (except Figs. 1, 9, and S1 and S2 in the Supplementary Information).
