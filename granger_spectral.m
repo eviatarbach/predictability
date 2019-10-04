@@ -1,4 +1,4 @@
-function [] = granger_spectral_multiple(offset, length)
+function [] = granger_spectral(offset, length)
 
 nobs = 14235;
 fres = 300;
