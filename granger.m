@@ -1,4 +1,4 @@
-function [] = granger_multiple(offset, length)
+function [] = granger(offset, length)
 
 nobs = 14235;
 max_delay = 360;
