@@ -1,4 +1,4 @@
-function [] = granger_seasonal_multiple(offset, length)
+function [] = granger_seasonal(offset, length)
 
 cd mvgc_v1.0
 
