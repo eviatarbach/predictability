@@ -26,3 +26,14 @@ Python:
 - [SciPy](https://scipy.org/scipylib/index.html)
 - [statsmodels](https://www.statsmodels.org/stable/index.html)
 - [xarray](http://xarray.pydata.org/en/stable/)
+
+You also need [Jupyter](https://jupyter.org/) for the notebook that generates the plots.
+
+## Description of files
+
+The files are listed in the order that they should be run:
+
+- **daily_data.py**: Takes daily means of the reanalysis data and removes leap days.
+- **retrieve_data.py**: Retrieves the reanalysis data (ERA-Interim) from ECMWF.
+- **variance.py**: Computes the variance of the SST data as well as the generalized variance of the atmospheric variables.
+- **Plots.ipynb**: Jupyter notebook that generates all the figures in the paper (except the diagram).
