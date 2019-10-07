@@ -8,6 +8,9 @@ The Granger causality analysis is done using the MVGC Matlab library, and plotti
 
 You can contact me with any questions at eviatarbach@protonmail.com.
 
+## Output of analysis
+The model output for the main analysis can be downloaded [here](http://www.terpconnect.umd.edu/~ebach/data01.nc), and for the spectral [here](http://www.terpconnect.umd.edu/~ebach/spectral.nc).
+
 ## Libraries used
 
 Matlab:
@@ -35,6 +38,7 @@ The files are listed in the order that they should be run:
 
 - **daily_data.py**: Takes daily means of the reanalysis data and removes leap days.
 - **retrieve_data.py**: Retrieves the reanalysis data (ERA-Interim) from ECMWF.
+- **anomalies_vort.f**: Fortran program to remove the seasonal and subseasonal components from the vorticity data, leaving the anomalies. Replace vorticity for the other variables.
 - **convert_anomalies.py**: Convert the anomalies to HDF5 for Matlab.
 - **granger.m**: Performs the main Granger causality analysis, as well as that for lead time (generates output used in Figs. 2–5 and 8a).
 - **granger_seasonal.m**: Performs the Granger causality analysis by season (generates output used in Fig. 7).
