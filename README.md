@@ -1,6 +1,6 @@
 # Code for "Local atmosphere–ocean predictability: dynamical origins, lead times, and seasonality"
 
-This repository contains the code for the paper "Local atmosphere–ocean predictability: dynamical origins, lead times, and seasonality" by Eviatar Bach, Safa Motesharrei, Eugenia Kalnay, and Alfredo Ruiz-Barradas.
+This repository contains the code for the paper "[Local atmosphere–ocean predictability: dynamical origins, lead times, and seasonality](https://doi.org/10.1175/JCLI-D-18-0817.1)" by Eviatar Bach, Safa Motesharrei, Eugenia Kalnay, and Alfredo Ruiz-Barradas.
 
 All the code was written by Eviatar Bach, except for the anomaly time-series code which was written by Alfredo Ruiz-Barradas. All code by Eviatar Bach is licensed under the GNU Public License v3.0.
 
